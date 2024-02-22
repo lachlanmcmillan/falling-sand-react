@@ -76,7 +76,7 @@ const Grid = ({ }) => {
 
   return (
     <>
-      <div 
+      <table 
         className={styles.grid} 
         onMouseDown={handleMouseDown}
         onMouseLeave={handleMouseLeave}
@@ -84,21 +84,16 @@ const Grid = ({ }) => {
         onMouseMove={handleMouseMove}
       >
       {range(constants.GRID_ROWS).map(y =>
-        <div key={y} className={styles.row}>
+        <tr key={y} className={styles.row}>
           {range(constants.GRID_COLS).map(x => 
-            <div 
+            <DivPixel 
               key={`${y} ${x}`}
-              className={styles.cell}
-              style={{ 
-                width: constants.PARTICLE_SIZE, 
-                height: constants.PARTICLE_SIZE,
-                backgroundColor: grid[x][y] || 'white'
-              }}
-            ></div> 
+              colour={grid[x][y]}
+            />
           )}
-        </div>
+        </tr>
       )}
-      </div>
+      </table>
 
       <ul>
         {/* 
@@ -111,5 +106,15 @@ const Grid = ({ }) => {
 
   )
 }
+
+const DivPixel = React.memo(({ colour }: { colour?: string }) =>
+  <td 
+    style={{ 
+      width: constants.PARTICLE_SIZE, 
+      height: constants.PARTICLE_SIZE,
+      backgroundColor: colour || 'white',
+    }}
+  />
+)
 
 export default Grid;

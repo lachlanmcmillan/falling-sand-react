@@ -7,13 +7,3 @@
 .row {
   display: table-row;
 }
-
-.cell {
-  /* border: 1px solid black; */
-  display: table-cell;
-  border-collapse: collapse;
-}
-
-.cell_filled {
-  background: black;
-}
