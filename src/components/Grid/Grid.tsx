@@ -101,6 +101,7 @@ const Grid = ({ }) => {
         <li>mouseLoc: &#123; x: {mouseLoc.x}, y: {mouseLoc.y} &#125;</li>
         */}
         <li>fps: {isPaused ? 0 : calcAverageFPS() }</li>
+        <li>frame time: {isPaused ? 0 : Math.floor(calcAverageRenderTime()) + 'ms' }</li>
       </ul>
     </>
 
