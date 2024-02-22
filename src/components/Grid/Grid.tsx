@@ -8,6 +8,18 @@ const range = (n: number) => {
   return new Array(n).fill(undefined).map((_, i) => i);
 }
 
+let RENDER_N = 30;
+let lastRender = Date.now();
+let renderTimes = new Array(RENDER_N).fill(0);
+let renderIndex = 0;
+
+const calcAverageRenderTime = () =>
+  renderTimes.reduce((total, current) => total + current, 0) / RENDER_N;
+
+const calcAverageFPS = () =>
+  Math.floor(1000 / calcAverageRenderTime())
+
+
 const Grid = ({ }) => {
   const {
     mouseDown,
@@ -21,6 +33,13 @@ const Grid = ({ }) => {
   React.useEffect(() => {
     if (!isPaused) { 
       events.triggerRenderFinished();
+
+      const currentTime = Date.now();
+      renderTimes[renderIndex++] = currentTime - lastRender;
+      if (renderIndex >= RENDER_N) {
+        renderIndex = 0;
+      }
+      lastRender = currentTime;
     }
   });
 
@@ -82,9 +101,11 @@ const Grid = ({ }) => {
       </div>
 
       <ul>
-        {/* <li>mouseDown: {mouseDown.toString()}</li>
-        <li>mouseLoc: &#123; x: {mouseLoc.x}, y: {mouseLoc.y} &#125;</li> */}
-        <li>fps: {isPaused ? 0 : Math.floor(1000 / renderTime)}</li>
+        {/* 
+        <li>mouseDown: {mouseDown.toString()}</li>
+        <li>mouseLoc: &#123; x: {mouseLoc.x}, y: {mouseLoc.y} &#125;</li>
+        */}
+        <li>fps: {isPaused ? 0 : calcAverageFPS() }</li>
       </ul>
     </>
 
