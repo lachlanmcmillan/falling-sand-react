@@ -1,0 +1,19 @@
+.grid {
+  display: table;
+  border-collapse: collapse;
+  border: 5px solid rgb(232, 232, 232);
+}
+
+.row {
+  display: table-row;
+}
+
+.cell {
+  /* border: 1px solid black; */
+  display: table-cell;
+  border-collapse: collapse;
+}
+
+.cell_filled {
+  background: black;
+}
