@@ -3,7 +3,7 @@ import * as constants from './constants';
 
 /**-- Types --**/
 
-export type TParticleGrid = Array<Array<string | undefined>>; // color[][]
+export type TParticleGrid = Array<Array<string | undefined>>; // arrays of pixel colours
 export type TCoordinates = { x: number, y: number }; 
 export type TState = {
   particleGrid: TParticleGrid,
