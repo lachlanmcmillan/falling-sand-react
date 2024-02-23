@@ -76,7 +76,6 @@ const Grid = ({ }) => {
           )}
         </tr>
       )}
-
       </table>
 
       <fieldset>
@@ -109,7 +108,6 @@ const Grid = ({ }) => {
         </div>
       </fieldset>
     </>
-
   )
 }
 

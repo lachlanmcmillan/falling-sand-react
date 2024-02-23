@@ -14,7 +14,6 @@ window.addEventListener("focus", () => {
   gameState.setIsPaused(false)
 });
 
-
 ReactDOM.createRoot(document.getElementById('app-root')!).render(
   <App />
 )
