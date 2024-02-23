@@ -32,6 +32,7 @@ let _subscriberCallbackFn: TCallbackFn | undefined = undefined;
 let _lastRenderTimestamp = Date.now();
 let _renderTimes = new Array(constants.FRAME_TIMING_SIZE).fill(0);
 let _renderTimesPtr = 0;
+let _lastTick = Date.now();
 
 let _stateSnapshot: TState = {
   particleGrid: _particleGrid,
@@ -55,9 +56,11 @@ function gameLoop() {
   const avgRenderTime = calcAverageRenderTime();
   const avgFPS = 1000 / avgRenderTime;
 
-  // physics will run as fast as the game can render
-  updateSandParticles();
-  handleMouseInput();
+  if ((Date.now() - _lastTick) > (1000 / constants.MAX_TICKRATE)) {
+    _lastTick = Date.now();
+    updateSandParticles();
+    handleMouseInput();
+  }
 
   _stateSnapshot = {
     particleGrid: _particleGrid,

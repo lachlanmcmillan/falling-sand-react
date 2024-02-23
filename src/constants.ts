@@ -7,3 +7,5 @@ export const PARTICLE_SIZE = 8;
 export const OUT_OF_BOUNDS = -1;
 
 export const FRAME_TIMING_SIZE = 30;
+
+export const MAX_TICKRATE = 60;
