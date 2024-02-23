@@ -16,7 +16,7 @@ function App() {
     avgRenderTime,
     saturation,
     lightness
-  } = React.useSyncExternalStore<gameState.TState>(gameState.subscribe, gameState.getSnapshot);
+  } = React.useSyncExternalStore<gameState.State>(gameState.subscribe, gameState.getSnapshot);
 
   // after every render
   React.useEffect(() => {

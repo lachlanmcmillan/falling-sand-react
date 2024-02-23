@@ -3,21 +3,21 @@ import * as constants from './constants';
 
 /**-- Types --**/
 
-export type TParticleGrid = Array<Array<string | undefined>>; // arrays of pixel colours
-export type TCoordinates = { x: number, y: number }; 
-export type TState = {
-  particleGrid: TParticleGrid,
+export type ParticleGrid = Array<Array<string | undefined>>; // arrays of pixel colours
+export type Coordinates = { x: number, y: number }; 
+export type State = {
+  particleGrid: ParticleGrid,
   isPaused: boolean,
   avgRenderTime: number,
   avgFPS: number,
   saturation: string,
   lightness: string,
 };
-export type TCallbackFn = () => unknown;
+export type CallbackFn = () => unknown;
 
 /**-- Internal module state --**/
 
-let _particleGrid: TParticleGrid = initParticleGrid(constants.SCREEN_COLS, constants.SCREEN_ROWS);
+let _particleGrid: ParticleGrid = initParticleGrid(constants.SCREEN_COLS, constants.SCREEN_ROWS);
 let _isMouseDown = false;
 let _mouseLocation = { x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS };
 let _particleColour = {
@@ -27,14 +27,14 @@ let _particleColour = {
 }
 let _isPaused = true;
 
-let _subscriberCallbackFn: TCallbackFn | undefined = undefined;
+let _subscriberCallbackFn: CallbackFn | undefined = undefined;
 
 let _lastRenderTimestamp = Date.now();
 let _renderTimes = new Array(constants.FRAME_TIMING_SIZE).fill(0);
 let _renderTimesPtr = 0;
 let _lastTick = Date.now();
 
-let _stateSnapshot: TState = {
+let _stateSnapshot: State = {
   particleGrid: _particleGrid,
   isPaused: _isPaused,
   avgRenderTime: 0,
@@ -160,11 +160,11 @@ export function subscribe(callbackFn: () => unknown) {
   };
 }
 
-export function getSnapshot(): TState { 
+export function getSnapshot(): State { 
 	return _stateSnapshot;
 }
 
-export function setMouseLocation(newLoc: TCoordinates) {
+export function setMouseLocation(newLoc: Coordinates) {
   _mouseLocation = newLoc;
 }
 
