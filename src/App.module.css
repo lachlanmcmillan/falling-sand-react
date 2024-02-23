@@ -13,6 +13,7 @@
 .table {
   border: 5px solid rgb(232, 232, 232);
   position: relative;
+  border-collapse: collapse;
 }
 
 .debugInfo {
