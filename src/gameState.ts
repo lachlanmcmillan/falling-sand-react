@@ -3,34 +3,30 @@ import * as constants from './constants';
 
 /**-- Types --**/
 
-export type TGrid = Array<Array<string | undefined>>; // color[][]
+export type TParticleGrid = Array<Array<string | undefined>>; // color[][]
 export type TCoordinates = { x: number, y: number }; 
 export type TState = {
-  grid: TGrid,
-  mouseDown: boolean,
+  particleGrid: TParticleGrid,
+  isMouseDown: boolean,
   mouseLoc: TCoordinates,
   isPaused: boolean,
-  renderTime: number,
-  timestamp: number,
 };
 export type TCallbackFn = () => unknown;
 
-/**-- Internal state - Do not expose directly --**/
+/**-- Internal module state --**/
 
-let _grid: TGrid = initGrid(constants.GRID_COLS, constants.GRID_ROWS);
-let _mouseDown = false;
-let _mouseLoc = { x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS };
+let _particleGrid: TParticleGrid = initParticleGrid(constants.SCREEN_COLS, constants.SCREEN_ROWS);
+let _isMouseDown = false;
+let _mouseLocation = { x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS };
 let _isPaused = true;
-let _subscriberCallback: TCallbackFn | undefined = undefined;
-let _colour = Math.floor(Math.random() * 360);
+let _colour = Math.floor(Math.random() * 360); // colour of the next particle
+let _subscriberCallbackFn: TCallbackFn | undefined = undefined;
 
 let _stateSnapshot: TState = {
-  grid: _grid,
-  mouseDown: _mouseDown,
-  mouseLoc: _mouseLoc,
+  particleGrid: _particleGrid,
+  isMouseDown: _isMouseDown,
+  mouseLoc: _mouseLocation,
   isPaused: _isPaused,
-  renderTime: 0,
-  timestamp: Date.now(),
 }
 
 /**-- Internal functionality --**/
@@ -40,74 +36,71 @@ events.onRenderFinished(() => {
 })
 
 function gameLoop() {
-  const timestamp = Date.now()
+  updateSandParticles();
+  handeMouseInput();
 
-  // -- handle sand physics --
+  _stateSnapshot = {
+    particleGrid: _particleGrid,
+    isPaused: _isPaused,
+    isMouseDown: _isMouseDown, // exported for debugging purposes
+    mouseLoc: _mouseLocation, // exported for debugging purposes
+  }
+
+  // trigger a react render by calling the callback function that react 
+  // provides
+  _subscriberCallbackFn!();
+}
+
+// @mutates internal state
+function updateSandParticles() {
   // go from the bottom upwards, skipping the bottom-most row, as those 
   // particles have nowhere to go
-  for (let y = constants.GRID_ROWS - 2; y >= 0; y--) {
-    for (let x = 0; x < constants.GRID_COLS; x++) {
-      // isSandy
-      if (_grid[x][y]) {
+  for (let y = constants.SCREEN_ROWS - 2; y >= 0; y--) {
+    for (let x = 0; x < constants.SCREEN_COLS; x++) {
+      // an empty space should be `undefined`
+      if (_particleGrid[x][y]) {
         // sand should fall downwards until it reaches the bottom 
-        if (!_grid[x][y+1]) {
-          _grid[x][y+1] = _grid[x][y];
-          _grid[x][y] = undefined;
+        if (!_particleGrid[x][y+1]) {
+          _particleGrid[x][y+1] = _particleGrid[x][y];
+          _particleGrid[x][y] = undefined;
         } else {
-          // below is taken, spill sideways
-          const canGoLeft = x > 0 && !_grid[x-1][y+1];
-          const canGoRight = x < constants.GRID_COLS-1 && !_grid[x+1][y+1];
+          // below space is taken, spill sideways
+          const canGoLeft = x > 0 && !_particleGrid[x-1][y+1];
+          const canGoRight = x < constants.SCREEN_COLS-1 && !_particleGrid[x+1][y+1];
           if (canGoLeft && canGoRight) {
             if (Math.random() < 0.5) {
-              _grid[x-1][y+1] = _grid[x][y];
+              _particleGrid[x-1][y+1] = _particleGrid[x][y];
             } else {
-              _grid[x+1][y+1] = _grid[x][y];
+              _particleGrid[x+1][y+1] = _particleGrid[x][y];
             }
-            _grid[x][y] = undefined;
+            _particleGrid[x][y] = undefined;
           } else if (canGoLeft) {
-            _grid[x-1][y+1] = _grid[x][y];
-            _grid[x][y] = undefined;
+            _particleGrid[x-1][y+1] = _particleGrid[x][y];
+            _particleGrid[x][y] = undefined;
           } else if (canGoRight) {
-            _grid[x+1][y+1] = _grid[x][y];
-            _grid[x][y] = undefined;
+            _particleGrid[x+1][y+1] = _particleGrid[x][y];
+            _particleGrid[x][y] = undefined;
           }
         }
       }
     }
   }
+}
 
-  // handle mouse 
+// @mutates internal state
+function handeMouseInput() {
   if (
-    _mouseDown && 
-    _mouseLoc.x >= 0 && _mouseLoc.x < constants.GRID_COLS &&
-    _mouseLoc.y >= 0 && _mouseLoc.y < constants.GRID_ROWS
+    _isMouseDown && 
+    _mouseLocation.x >= 0 && _mouseLocation.x < constants.SCREEN_COLS &&
+    _mouseLocation.y >= 0 && _mouseLocation.y < constants.SCREEN_ROWS
   ) {
-    const { x, y } = _mouseLoc;
+    const { x, y } = _mouseLocation;
     if (_colour >= 360) _colour = 0;
-    _grid[x][y] = `hsl(${_colour++}, 42%, 61%)`;
+    _particleGrid[x][y] = `hsl(${_colour++}, 42%, 61%)`;
   }
-
-  const newStateSnapshot = {
-    grid: _grid,
-    mouseDown: _mouseDown,
-    mouseLoc: _mouseLoc,
-    isPaused: _isPaused,
-    renderTime: timestamp - _stateSnapshot.timestamp, 
-    timestamp,
-  }
-
-  // trigger render
-  triggerRender(newStateSnapshot);
 }
 
-function triggerRender(newState: TState) {
-  _stateSnapshot = newState;
-  // don't need to send the state back to React, as React calls 
-  // getSnapshot
-  _subscriberCallback!();
-}
-
-function initGrid(cols, rows, value=undefined) {
+function initParticleGrid(cols, rows, value=undefined) {
   return (new Array(cols))
     .fill(undefined)
     .map(_ => (new Array(rows))
@@ -119,11 +112,11 @@ function initGrid(cols, rows, value=undefined) {
 /**-- Public functions --**/
 
 export function subscribe(callbackFn: () => unknown) {
-	_subscriberCallback = callbackFn;
+	_subscriberCallbackFn = callbackFn;
   
   // unsubscribe 
 	return () => {
-    _subscriberCallback = undefined;
+    _subscriberCallbackFn = undefined;
   };
 }
 
@@ -132,11 +125,11 @@ export function getSnapshot(): TState {
 }
 
 export function setMouseLoc(newLoc: TCoordinates) {
-  _mouseLoc = newLoc;
+  _mouseLocation = newLoc;
 }
 
 export function setMouseDown(newValue: boolean) {
-  _mouseDown = newValue;
+  _isMouseDown = newValue;
 }
 
 export function setIsPaused(newValue: boolean) {

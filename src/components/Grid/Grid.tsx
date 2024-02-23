@@ -22,10 +22,9 @@ const calcAverageFPS = () =>
 
 const Grid = ({ }) => {
   const {
-    mouseDown,
+    isMouseDown,
     mouseLoc,
-    grid,
-    renderTime,
+    particleGrid,
     isPaused,
   } = React.useSyncExternalStore<gameState.TState>(gameState.subscribe, gameState.getSnapshot);
 
@@ -83,12 +82,12 @@ const Grid = ({ }) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       >
-      {range(constants.GRID_ROWS).map(y =>
+      {range(constants.SCREEN_ROWS).map(y =>
         <tr key={y} className={styles.row}>
-          {range(constants.GRID_COLS).map(x => 
+          {range(constants.SCREEN_COLS).map(x => 
             <DivPixel 
               key={`${y} ${x}`}
-              colour={grid[x][y]}
+              colour={particleGrid[x][y]}
             />
           )}
         </tr>
