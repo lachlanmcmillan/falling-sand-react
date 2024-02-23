@@ -63,19 +63,19 @@ const Grid = ({ }) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       >
-      {rows.map((_, y) =>
-        <tr key={y} className={styles.row}>
-          {cols.map((_, x) => 
-            <td 
-              style={{ 
-                width: constants.PARTICLE_SIZE, 
-                height: constants.PARTICLE_SIZE,
-                backgroundColor: particleGrid[x][y] || 'white',
-              }}
-            />
-          )}
-        </tr>
-      )}
+        {rows.map((_, y) =>
+          <tr className={styles.row}>
+            {cols.map((_, x) => 
+              <td 
+                style={{ 
+                  width: constants.PARTICLE_SIZE, 
+                  height: constants.PARTICLE_SIZE,
+                  backgroundColor: particleGrid[x][y] || 'white',
+                }}
+              />
+            )}
+          </tr>
+        )}
       </table>
 
       <fieldset>
