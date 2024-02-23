@@ -7,11 +7,11 @@ export type TParticleGrid = Array<Array<string | undefined>>; // color[][]
 export type TCoordinates = { x: number, y: number }; 
 export type TState = {
   particleGrid: TParticleGrid,
-  isMouseDown: boolean,
-  mouseLoc: TCoordinates,
   isPaused: boolean,
-  avgRenderTime: number;
-  avgFPS: number;
+  avgRenderTime: number,
+  avgFPS: number,
+  saturation: string,
+  lightness: string,
 };
 export type TCallbackFn = () => unknown;
 
@@ -20,7 +20,11 @@ export type TCallbackFn = () => unknown;
 let _particleGrid: TParticleGrid = initParticleGrid(constants.SCREEN_COLS, constants.SCREEN_ROWS);
 let _isMouseDown = false;
 let _mouseLocation = { x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS };
-let _colour = Math.floor(Math.random() * 360); // colour of the next particle
+let _particleColour = {
+  hue: Math.floor(Math.random() * 360),
+  saturation: '100',
+  lightness: '90'
+}
 let _isPaused = true;
 
 let _subscriberCallbackFn: TCallbackFn | undefined = undefined;
@@ -31,11 +35,11 @@ let _renderTimesPtr = 0;
 
 let _stateSnapshot: TState = {
   particleGrid: _particleGrid,
-  isMouseDown: _isMouseDown,
-  mouseLoc: _mouseLocation,
   isPaused: _isPaused,
   avgRenderTime: 0,
-  avgFPS: 0
+  avgFPS: 0,
+  saturation: _particleColour.saturation,
+  lightness: _particleColour.lightness,
 }
 
 /**-- Internal functionality --**/
@@ -51,16 +55,17 @@ function gameLoop() {
   const avgRenderTime = calcAverageRenderTime();
   const avgFPS = 1000 / avgRenderTime;
 
+  // physics will run as fast as the game can render
   updateSandParticles();
   handleMouseInput();
 
   _stateSnapshot = {
     particleGrid: _particleGrid,
     isPaused: _isPaused,
-    isMouseDown: _isMouseDown, // exported for debugging purposes
-    mouseLoc: _mouseLocation, // exported for debugging purposes
     avgRenderTime,
-    avgFPS
+    avgFPS,
+    saturation: _particleColour.saturation,
+    lightness: _particleColour.lightness,
   }
 
   // trigger a react render by calling the callback function that react 
@@ -112,8 +117,8 @@ function handleMouseInput() {
     _mouseLocation.y >= 0 && _mouseLocation.y < constants.SCREEN_ROWS
   ) {
     const { x, y } = _mouseLocation;
-    if (_colour >= 360) _colour = 0;
-    _particleGrid[x][y] = `hsl(${_colour++}, 42%, 61%)`;
+    if (++_particleColour.hue >= 360) _particleColour.hue = 0;
+    _particleGrid[x][y] = `hsl(${_particleColour.hue}, ${_particleColour.saturation}%, ${_particleColour.lightness}%)`;
   }
 }
 
@@ -171,4 +176,16 @@ export function setIsPaused(newValue: boolean) {
   if (!_isPaused) {
     gameLoop();
   }
+}
+
+export function reset() {
+  _particleGrid = initParticleGrid(constants.SCREEN_COLS, constants.SCREEN_ROWS);
+}
+
+export function setColourSaturation(newValue: string) {
+  _particleColour.saturation = newValue;
+}
+
+export function setColourLightness(newValue: string) {
+  _particleColour.lightness = newValue;
 }

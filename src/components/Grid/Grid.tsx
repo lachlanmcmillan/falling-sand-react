@@ -10,12 +10,12 @@ const range = (n: number) => {
 
 const Grid = ({ }) => {
   const {
-    isMouseDown,
-    mouseLoc,
     particleGrid,
     isPaused,
     avgFPS,
-    avgRenderTime
+    avgRenderTime,
+    saturation,
+    lightness
   } = React.useSyncExternalStore<gameState.TState>(gameState.subscribe, gameState.getSnapshot);
 
   // after every render
@@ -56,6 +56,11 @@ const Grid = ({ }) => {
 
   return (
     <>
+      <div className={styles.debugInfo}>
+        fps: {isPaused ? 0 : Math.floor(avgFPS)},
+        frame time: {isPaused ? 0 : Math.floor(avgRenderTime) + 'ms' }
+      </div>
+
       <table 
         className={styles.grid} 
         onMouseDown={handleMouseDown}
@@ -76,16 +81,38 @@ const Grid = ({ }) => {
           )}
         </tr>
       )}
+
       </table>
 
-      <ul>
-        {/* 
-        <li>mouseDown: {mouseDown.toString()}</li>
-        <li>mouseLoc: &#123; x: {mouseLoc.x}, y: {mouseLoc.y} &#125;</li>
-        */}
-        <li>fps: {isPaused ? 0 : Math.floor(avgFPS) }</li>
-        <li>frame time: {isPaused ? 0 : Math.floor(avgRenderTime) + 'ms' }</li>
-      </ul>
+      <fieldset>
+        <legend>Colour</legend>
+        <div>
+          <label className={styles.sliderLabel}>Saturation</label>
+          <input 
+            className={styles.slider}
+            type="range" 
+            value={saturation} 
+            min="0" 
+            max="100" 
+            onChange={(evt) => 
+              gameState.setColourSaturation(evt.target.value)
+            }
+          />
+        </div>
+        <div>
+          <label className={styles.sliderLabel}>Lightness</label>
+          <input 
+            className={styles.slider}
+            type="range" 
+            value={lightness} 
+            min="0" 
+            max="100" 
+            onChange={(evt) => 
+              gameState.setColourLightness(evt.target.value)
+            }
+          />
+        </div>
+      </fieldset>
     </>
 
   )

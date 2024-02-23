@@ -1,12 +1,16 @@
 import Grid from '../Grid/Grid';
-import './App.css'
+import styles from './App.module.css'
+import * as gameState from '../../gameState';
 
 function App() {
   return (
     <>
+      <h1 className={styles.title}>Falling Sand</h1>
+      <p className={styles.subtitle}>Click on the canvas to create sand</p>
       <Grid />
-      <h1>Falling Sand</h1>
-      <p>Click on the canvas to create sand</p>
+      <div className={styles.buttonBar}>
+        <button onClick={gameState.reset}>Reset</button>
+      </div>
     </>
   )
 }

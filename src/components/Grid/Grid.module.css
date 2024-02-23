@@ -2,8 +2,24 @@
   display: table;
   border-collapse: collapse;
   border: 5px solid rgb(232, 232, 232);
+  position: relative;
 }
 
-.row {
-  display: table-row;
+.debugInfo {
+  text-align: center;
+  font-family: monospace;
+  padding: 5px 10px;
+}
+
+.sliderField > * {
+  vertical-align: middle;
+}
+
+.sliderLabel {
+  margin: 0 10px 5px 0;
+  vertical-align: middle;
+}
+
+.slider {
+  vertical-align: middle;
 }
