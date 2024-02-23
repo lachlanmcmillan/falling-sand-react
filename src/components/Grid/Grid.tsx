@@ -23,12 +23,6 @@ const Grid = ({ }) => {
     events.triggerRenderFinished();
   });
 
-  React.useEffect(() => {
-    // starting paused and then unpausing after mount helps prevent the game and 
-    // render loop from being triggered multiple times
-    gameState.setIsPaused(false)
-  }, []);
-
   const handleMouseMove = (evt: React.MouseEvent<HTMLDivElement>) => {
     gameState.setMouseLoc(getMouseLocationInGrid(evt));
   }
@@ -36,6 +30,7 @@ const Grid = ({ }) => {
   const handleMouseDown = (evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     gameState.setMouseDown(true);
+    if (isPaused) gameState.setIsPaused(false);
   }
 
   const handleMouseLeave = () => {
