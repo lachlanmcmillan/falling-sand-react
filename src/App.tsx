@@ -44,8 +44,8 @@ function App() {
 
   const getMouseLocationInGrid = React.useCallback((evt: React.MouseEvent<HTMLDivElement>) => {
     return {
-      x: Math.floor((evt.clientX - evt.currentTarget.offsetLeft) / constants.PARTICLE_SIZE),
-      y: Math.floor((evt.clientY - evt.currentTarget.offsetTop) / constants.PARTICLE_SIZE),
+      x: Math.floor((evt.pageX - evt.currentTarget.offsetLeft) / constants.PARTICLE_SIZE),
+      y: Math.floor((evt.pageY - evt.currentTarget.offsetTop) / constants.PARTICLE_SIZE),
     }
   }, []);
 
