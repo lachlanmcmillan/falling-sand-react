@@ -4,10 +4,6 @@ import * as gameState from '../../gameState';
 import * as constants from '../../constants';
 import * as events from '../../events';
 
-const range = (n: number) => {
-  return new Array(n).fill(undefined).map((_, i) => i);
-}
-
 const Grid = ({ }) => {
   const {
     particleGrid,
@@ -63,9 +59,9 @@ const Grid = ({ }) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       >
-      {range(constants.SCREEN_ROWS).map(y =>
+      {Array(constants.SCREEN_ROWS).fill(undefined).map((_, y) =>
         <tr key={y} className={styles.row}>
-          {range(constants.SCREEN_COLS).map(x => 
+          {Array(constants.SCREEN_COLS).fill(undefined).map((_, x) => 
             <td 
               style={{ 
                 width: constants.PARTICLE_SIZE, 
