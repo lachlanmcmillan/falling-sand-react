@@ -23,35 +23,35 @@ function App() {
     events.triggerRenderFinished();
   });
 
-  const handleMouseMove = (evt: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = React.useCallback((evt: React.MouseEvent<HTMLDivElement>) => {
     gameState.setMouseLoc(getMouseLocationInGrid(evt));
-  }
+  }, []);
 
-  const handleMouseDown = (evt: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDown = React.useCallback((evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     gameState.setMouseDown(true);
     if (isPaused) gameState.setIsPaused(false);
-  }
+  }, [isPaused]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = React.useCallback(() => {
     gameState.setMouseLoc({ x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS });
     gameState.setMouseDown(false);
-  }
+  }, []);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = React.useCallback(() => {
     gameState.setMouseDown(false);
-  }
+  }, []);
 
-  const handleResetClick = () => {
+  const handleResetClick = React.useCallback(() => {
     gameState.reset();
-  }
+  }, []);
 
-  const getMouseLocationInGrid = (evt: React.MouseEvent<HTMLDivElement>) => {
+  const getMouseLocationInGrid = React.useCallback((evt: React.MouseEvent<HTMLDivElement>) => {
     return {
       x: Math.floor((evt.clientX - evt.currentTarget.offsetLeft) / constants.PARTICLE_SIZE),
       y: Math.floor((evt.clientY - evt.currentTarget.offsetTop) / constants.PARTICLE_SIZE),
     }
-  }
+  }, []);
 
   return (
     <>
