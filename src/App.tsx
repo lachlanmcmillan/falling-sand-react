@@ -55,8 +55,7 @@ function App() {
 
   return (
     <>
-      <h1 className={styles.title}>Falling Sand</h1>
-      <p className={styles.subtitle}>Click on the canvas to create sand</p>
+      <Header />
 
       <div className={styles.debugInfo}>
         fps: {isPaused ? 0 : Math.floor(avgFPS)},
@@ -85,41 +84,56 @@ function App() {
         )}
       </table>
 
-      <fieldset>
-        <legend>Colour</legend>
-        <div>
-          <label className={styles.sliderLabel}>Saturation</label>
-          <input 
-            className={styles.slider}
-            type="range" 
-            value={saturation} 
-            min="0" 
-            max="100" 
-            onChange={(evt) => 
-              gameState.setColourSaturation(evt.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label className={styles.sliderLabel}>Lightness</label>
-          <input 
-            className={styles.slider}
-            type="range" 
-            value={lightness} 
-            min="0" 
-            max="100" 
-            onChange={(evt) => 
-              gameState.setColourLightness(evt.target.value)
-            }
-          />
-        </div>
-      </fieldset>
+      <ColourControls saturation={saturation} lightness={lightness} />
 
-      <div className={styles.buttonBar}>
-        <button onClick={handleResetClick}>Reset</button>
-      </div>
+      <ButtonBar onResetClick={handleResetClick} />
     </>
   )
 }
+
+const Header = React.memo(() => 
+  <>
+    <h1 className={styles.title}>Falling Sand</h1>
+    <p className={styles.subtitle}>Click on the canvas to create sand</p>
+  </>
+);
+
+const ColourControls = React.memo(({ saturation, lightness }: any) => 
+  <fieldset>
+    <legend>Colour</legend>
+    <div>
+      <label className={styles.sliderLabel}>Saturation</label>
+      <input 
+        className={styles.slider}
+        type="range" 
+        value={saturation} 
+        min="0" 
+        max="100" 
+        onChange={(evt) => 
+          gameState.setColourSaturation(evt.target.value)
+        }
+      />
+    </div>
+    <div>
+      <label className={styles.sliderLabel}>Lightness</label>
+      <input 
+        className={styles.slider}
+        type="range" 
+        value={lightness} 
+        min="0" 
+        max="100" 
+        onChange={(evt) => 
+          gameState.setColourLightness(evt.target.value)
+        }
+      />
+    </div>
+  </fieldset>
+);
+
+const ButtonBar = React.memo(({ onResetClick }: any) => 
+  <div className={styles.buttonBar}>
+    <button onClick={onResetClick}>Reset</button>
+  </div>
+);
 
 export default App
