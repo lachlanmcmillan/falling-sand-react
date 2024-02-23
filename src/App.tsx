@@ -1,14 +1,14 @@
 import React from 'react';
-import styles from './Grid.module.css';
-import * as gameState from '../../gameState';
-import * as constants from '../../constants';
-import * as events from '../../events';
+import styles from './App.module.css';
+import * as gameState from './gameState';
+import * as constants from './constants';
+import * as events from './events';
 
-// 1ms saved here
+// 1ms saved by pre-initialising here
 const rows = Array(constants.SCREEN_ROWS).fill(undefined);
 const cols = Array(constants.SCREEN_COLS).fill(undefined)
 
-const Grid = ({ }) => {
+function App() {
   const {
     particleGrid,
     isPaused,
@@ -42,6 +42,10 @@ const Grid = ({ }) => {
     gameState.setMouseDown(false);
   }
 
+  const handleResetClick = () => {
+    gameState.reset();
+  }
+
   const getMouseLocationInGrid = (evt: React.MouseEvent<HTMLDivElement>) => {
     return {
       x: Math.floor((evt.clientX - evt.currentTarget.offsetLeft) / constants.PARTICLE_SIZE),
@@ -51,6 +55,9 @@ const Grid = ({ }) => {
 
   return (
     <>
+      <h1 className={styles.title}>Falling Sand</h1>
+      <p className={styles.subtitle}>Click on the canvas to create sand</p>
+
       <div className={styles.debugInfo}>
         fps: {isPaused ? 0 : Math.floor(avgFPS)},
         frame time: {isPaused ? 0 : Math.floor(avgRenderTime) + 'ms' }
@@ -107,8 +114,12 @@ const Grid = ({ }) => {
           />
         </div>
       </fieldset>
+
+      <div className={styles.buttonBar}>
+        <button onClick={handleResetClick}>Reset</button>
+      </div>
     </>
   )
 }
 
-export default Grid;
+export default App
