@@ -164,7 +164,7 @@ export function getSnapshot(): TState {
 	return _stateSnapshot;
 }
 
-export function setMouseLoc(newLoc: TCoordinates) {
+export function setMouseLocation(newLoc: TCoordinates) {
   _mouseLocation = newLoc;
 }
 

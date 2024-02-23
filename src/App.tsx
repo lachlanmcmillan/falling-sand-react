@@ -24,7 +24,7 @@ function App() {
   });
 
   const handleMouseMove = React.useCallback((evt: React.MouseEvent<HTMLDivElement>) => {
-    gameState.setMouseLoc(getMouseLocationInGrid(evt));
+    gameState.setMouseLocation(getMouseLocationInGrid(evt));
   }, []);
 
   const handleMouseDown = React.useCallback((evt: React.MouseEvent<HTMLDivElement>) => {
@@ -34,16 +34,12 @@ function App() {
   }, [isPaused]);
 
   const handleMouseLeave = React.useCallback(() => {
-    gameState.setMouseLoc({ x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS });
+    gameState.setMouseLocation({ x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS });
     gameState.setMouseDown(false);
   }, []);
 
   const handleMouseUp = React.useCallback(() => {
     gameState.setMouseDown(false);
-  }, []);
-
-  const handleResetClick = React.useCallback(() => {
-    gameState.reset();
   }, []);
 
   const getMouseLocationInGrid = React.useCallback((evt: React.MouseEvent<HTMLDivElement>) => {
@@ -63,7 +59,7 @@ function App() {
       </div>
 
       <table 
-        className={styles.grid} 
+        className={styles.table} 
         onMouseDown={handleMouseDown}
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleMouseUp}
@@ -86,7 +82,7 @@ function App() {
 
       <ColourControls saturation={saturation} lightness={lightness} />
 
-      <ButtonBar onResetClick={handleResetClick} />
+      <ButtonBar />
     </>
   )
 }
@@ -130,9 +126,9 @@ const ColourControls = React.memo(({ saturation, lightness }: any) =>
   </fieldset>
 );
 
-const ButtonBar = React.memo(({ onResetClick }: any) => 
+const ButtonBar = React.memo(() => 
   <div className={styles.buttonBar}>
-    <button onClick={onResetClick}>Reset</button>
+    <button onClick={() => gameState.reset()}>Reset</button>
   </div>
 );
 
