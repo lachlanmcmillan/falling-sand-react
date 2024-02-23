@@ -8,38 +8,19 @@ const range = (n: number) => {
   return new Array(n).fill(undefined).map((_, i) => i);
 }
 
-let RENDER_N = 30;
-let lastRender = Date.now();
-let renderTimes = new Array(RENDER_N).fill(0);
-let renderIndex = 0;
-
-const calcAverageRenderTime = () =>
-  renderTimes.reduce((total, current) => total + current, 0) / RENDER_N;
-
-const calcAverageFPS = () =>
-  Math.floor(1000 / calcAverageRenderTime())
-
-
 const Grid = ({ }) => {
   const {
     isMouseDown,
     mouseLoc,
     particleGrid,
     isPaused,
+    avgFPS,
+    avgRenderTime
   } = React.useSyncExternalStore<gameState.TState>(gameState.subscribe, gameState.getSnapshot);
 
   // after every render
   React.useEffect(() => {
-    if (!isPaused) { 
-      events.triggerRenderFinished();
-
-      const currentTime = Date.now();
-      renderTimes[renderIndex++] = currentTime - lastRender;
-      if (renderIndex >= RENDER_N) {
-        renderIndex = 0;
-      }
-      lastRender = currentTime;
-    }
+    events.triggerRenderFinished();
   });
 
   React.useEffect(() => {
@@ -85,9 +66,12 @@ const Grid = ({ }) => {
       {range(constants.SCREEN_ROWS).map(y =>
         <tr key={y} className={styles.row}>
           {range(constants.SCREEN_COLS).map(x => 
-            <DivPixel 
-              key={`${y} ${x}`}
-              colour={particleGrid[x][y]}
+            <td 
+              style={{ 
+                width: constants.PARTICLE_SIZE, 
+                height: constants.PARTICLE_SIZE,
+                backgroundColor: particleGrid[x][y] || 'white',
+              }}
             />
           )}
         </tr>
@@ -99,22 +83,12 @@ const Grid = ({ }) => {
         <li>mouseDown: {mouseDown.toString()}</li>
         <li>mouseLoc: &#123; x: {mouseLoc.x}, y: {mouseLoc.y} &#125;</li>
         */}
-        <li>fps: {isPaused ? 0 : calcAverageFPS() }</li>
-        <li>frame time: {isPaused ? 0 : Math.floor(calcAverageRenderTime()) + 'ms' }</li>
+        <li>fps: {isPaused ? 0 : Math.floor(avgFPS) }</li>
+        <li>frame time: {isPaused ? 0 : Math.floor(avgRenderTime) + 'ms' }</li>
       </ul>
     </>
 
   )
 }
-
-const DivPixel = React.memo(({ colour }: { colour?: string }) =>
-  <td 
-    style={{ 
-      width: constants.PARTICLE_SIZE, 
-      height: constants.PARTICLE_SIZE,
-      backgroundColor: colour || 'white',
-    }}
-  />
-)
 
 export default Grid;

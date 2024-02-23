@@ -10,6 +10,8 @@ export type TState = {
   isMouseDown: boolean,
   mouseLoc: TCoordinates,
   isPaused: boolean,
+  avgRenderTime: number;
+  avgFPS: number;
 };
 export type TCallbackFn = () => unknown;
 
@@ -18,15 +20,22 @@ export type TCallbackFn = () => unknown;
 let _particleGrid: TParticleGrid = initParticleGrid(constants.SCREEN_COLS, constants.SCREEN_ROWS);
 let _isMouseDown = false;
 let _mouseLocation = { x: constants.OUT_OF_BOUNDS, y: constants.OUT_OF_BOUNDS };
-let _isPaused = true;
 let _colour = Math.floor(Math.random() * 360); // colour of the next particle
+let _isPaused = true;
+
 let _subscriberCallbackFn: TCallbackFn | undefined = undefined;
+
+let _lastRenderTimestamp = Date.now();
+let _renderTimes = new Array(constants.FRAME_TIMING_SIZE).fill(0);
+let _renderTimesPtr = 0;
 
 let _stateSnapshot: TState = {
   particleGrid: _particleGrid,
   isMouseDown: _isMouseDown,
   mouseLoc: _mouseLocation,
   isPaused: _isPaused,
+  avgRenderTime: 0,
+  avgFPS: 0
 }
 
 /**-- Internal functionality --**/
@@ -36,14 +45,22 @@ events.onRenderFinished(() => {
 })
 
 function gameLoop() {
+  if (_isPaused) return;
+
+  updateRenderTimes();
+  const avgRenderTime = calcAverageRenderTime();
+  const avgFPS = 1000 / avgRenderTime;
+
   updateSandParticles();
-  handeMouseInput();
+  handleMouseInput();
 
   _stateSnapshot = {
     particleGrid: _particleGrid,
     isPaused: _isPaused,
     isMouseDown: _isMouseDown, // exported for debugging purposes
     mouseLoc: _mouseLocation, // exported for debugging purposes
+    avgRenderTime,
+    avgFPS
   }
 
   // trigger a react render by calling the callback function that react 
@@ -88,7 +105,7 @@ function updateSandParticles() {
 }
 
 // @mutates internal state
-function handeMouseInput() {
+function handleMouseInput() {
   if (
     _isMouseDown && 
     _mouseLocation.x >= 0 && _mouseLocation.x < constants.SCREEN_COLS &&
@@ -98,6 +115,21 @@ function handeMouseInput() {
     if (_colour >= 360) _colour = 0;
     _particleGrid[x][y] = `hsl(${_colour++}, 42%, 61%)`;
   }
+}
+
+// @mutates internal state
+const updateRenderTimes = () => {
+  const currentTimestamp = Date.now();
+  _renderTimes[_renderTimesPtr++] = currentTimestamp - _lastRenderTimestamp;
+  if (_renderTimesPtr >= constants.FRAME_TIMING_SIZE) {
+    _renderTimesPtr = 0;
+  }
+  _lastRenderTimestamp = currentTimestamp;
+}
+
+// average time to generate and render frame in ms over the last `n` frames.
+const calcAverageRenderTime = () => {
+  return _renderTimes.reduce((total, current) => total + current, 0) / constants.FRAME_TIMING_SIZE;
 }
 
 function initParticleGrid(cols, rows, value=undefined) {
